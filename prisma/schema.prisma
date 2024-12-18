@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Subject {
+  subjectId      Int           @id @default(autoincrement())
+  subjectName    String        @unique
+  subDescription String
+  assignments    Assignment[]
+  users          User[]        @relation(name: "SubjectUser")
+  SubjectUser    SubjectUser[]
+}
+
+model Assignment {
+  assignmentId Int     @id @default(autoincrement())
+  title        String
+  description  String?
+  codeSnippet  String
+  subjectId    Int
+  subject      Subject @relation(fields: [subjectId], references: [subjectId])
+}
+
+model User {
+  userId      Int           @id @default(autoincrement())
+  fname       String?
+  lname       String?
+  email       String        @unique
+  password    String
+  subjects    Subject[]     @relation(name: "SubjectUser")
+  SubjectUser SubjectUser[]
+}
+
+model SubjectUser {
+  subjectId Int @unique
+  userId    Int @unique
+
+  subject Subject @relation(fields: [subjectId], references: [subjectId])
+  user    User    @relation(fields: [userId], references: [userId])
+}
+
+model keyValue {
+  key   String  @unique
+  value Boolean
+}
