@@ -1,8 +1,9 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt'
 import { Resend } from 'resend';
 import db from "../../db"
 import { env } from 'process';
+import { SigninPayload } from '../types/user';
 
 const genOtp = () => {
     return Math.floor(100000 + Math.random() * 900000)
@@ -12,9 +13,20 @@ let currOtp: number
 const router = express.Router();
 
 
-router.post("/", async (req, res) => {
+
+const verifyInput = (req: Request, res: Response, next: NextFunction) => {
+    const payload = SigninPayload.safeParse(req.body)
+    if (payload.success) {
+        next()
+    }
+    return res.status(411).json({
+        msg : "Invalid Inputs"
+    })
+}
+
+
+router.post("/",verifyInput, async (req, res) => {
     const resend = new Resend(env.RESEND_API_KEY);
-    
     const email = req.body.email
     const userPass = req.body.password
     currOtp = genOtp()
@@ -62,10 +74,7 @@ if(!user?.id){
 })
 
 router.post("/verify",async(req,res)=>{
-const password = req.body.password
 const otp = req.body.otp
-const saltRounds = 10
-const email = req.body.email
 if(Number(otp) === currOtp){
     currOtp = 0
     return res.json({

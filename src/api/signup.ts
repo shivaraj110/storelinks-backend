@@ -3,7 +3,9 @@ import bcrypt from 'bcrypt'
 import { Resend } from 'resend';
 import db from "../../db"
 import { env } from 'process';
+import { Request , Response,NextFunction} from 'express';
 import { error } from 'console';
+import { SignupPayload } from '../types/user';
 const router = express.Router();
 
 const genOtp = () => {
@@ -13,8 +15,18 @@ const genOtp = () => {
 
 let currOtp: number
 
+const verifyInput = (req: Request, res: Response, next: NextFunction) => {
+    const payload = SignupPayload.safeParse(req.body)
+    if (payload.success) {
+        next()
+    }
+    return res.status(411).json({
+        msg : "Invalid Inputs"
+    })
+}
 
-router.post("/",async(req,res)=>{
+
+router.post("/",verifyInput,async(req,res)=>{
     const resend = new Resend(env.RESEND_API_KEY);
     const email = req.body.email
     try {
@@ -51,7 +63,8 @@ router.post("/verify",async(req,res)=>{
     const saltRounds = 10
 const email = req.body.email
 const otp = req.body.otp
-if(Number(otp) === currOtp){
+    try {
+    if(Number(otp) === currOtp){
     currOtp = 0
     bcrypt.genSalt(saltRounds, (err, salt) => {
         if (err) {
@@ -78,13 +91,19 @@ if(Number(otp) === currOtp){
     return res.json({
         msg : "verified"
     })
-}
-else{
-    currOtp = 0
-    return res.json({
-        msg:"verification failed!"
-    })
-}
+    }
+    else{
+        currOtp = 0
+        return res.json({
+            msg:"verification failed!"
+        })
+    }
+    }
+         catch (e) {
+        return res.status(413).json({
+                msg : "invalid input"
+            })
+        }
 })
 
 router.get("/",async(req,res)=>{
