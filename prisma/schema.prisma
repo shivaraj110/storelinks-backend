@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// This is just a basic example and might need adjustments based on your specific requirements.
+// Consider adding constraints, indexes, and other relevant fields.
 
 generator client {
   provider = "prisma-client-js"
@@ -13,43 +10,89 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Subject {
-  subjectId      Int           @id @default(autoincrement())
-  subjectName    String        @unique
-  subDescription String
-  assignments    Assignment[]
-  users          User[]        @relation(name: "SubjectUser")
-  SubjectUser    SubjectUser[]
-}
-
-model Assignment {
-  assignmentId Int     @id @default(autoincrement())
-  title        String
-  description  String?
-  codeSnippet  String
-  subjectId    Int
-  subject      Subject @relation(fields: [subjectId], references: [subjectId])
-}
-
 model User {
-  userId      Int           @id @default(autoincrement())
-  fname       String?
-  lname       String?
-  email       String        @unique
-  password    String
-  subjects    Subject[]     @relation(name: "SubjectUser")
-  SubjectUser SubjectUser[]
+  id       Int    @id @default(autoincrement())
+  fname    String
+  lname    String
+  email    String @unique
+  password String
+  links    Link[]
 }
 
-model SubjectUser {
-  subjectId Int @unique
-  userId    Int @unique
+model Link {
+  id     Int    @id @default(autoincrement())
+  title  String
+  desc   String
+  link   String
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int
 
-  subject Subject @relation(fields: [subjectId], references: [subjectId])
-  user    User    @relation(fields: [userId], references: [userId])
+  @@index([userId])
 }
 
-model keyValue {
-  key   String  @unique
-  value Boolean
+model PublicLink {
+  id                    Int                     @id @default(autoincrement())
+  title                 String
+  description           String
+  link                  String
+  visits                Int                     @default(0)
+  upvotes               Int                     @default(0)
+  category              PublicLinkCategory      @relation(fields: [categoryId], references: [id])
+  categoryId            Int
+  FreeStudyMaterials    FreeStudyMaterials[]
+  FreeAndUsefulSoftware FreeAndUsefulSoftware[]
+  JobsAndInternships    JobsAndInternships[]
+  Scholarships          Scholarships[]
+  Hackathons            Hackathons[]
+}
+
+model PublicLinkCategory {
+  id          Int          @id @default(autoincrement())
+  category    String       @unique
+  publicLinks PublicLink[]
+}
+
+model FreeStudyMaterials {
+  id           Int        @id @default(autoincrement())
+  title        String
+  desc         String
+  link         String
+  publicLink   PublicLink @relation(fields: [publicLinkId], references: [id])
+  publicLinkId Int
+}
+
+model FreeAndUsefulSoftware {
+  id           Int        @id @default(autoincrement())
+  title        String
+  desc         String
+  link         String
+  publicLink   PublicLink @relation(fields: [publicLinkId], references: [id])
+  publicLinkId Int
+}
+
+model JobsAndInternships {
+  id           Int        @id @default(autoincrement())
+  title        String
+  desc         String
+  link         String
+  publicLink   PublicLink @relation(fields: [publicLinkId], references: [id])
+  publicLinkId Int
+}
+
+model Scholarships {
+  id           Int        @id @default(autoincrement())
+  title        String
+  desc         String
+  link         String
+  publicLink   PublicLink @relation(fields: [publicLinkId], references: [id])
+  publicLinkId Int
+}
+
+model Hackathons {
+  id           Int        @id @default(autoincrement())
+  title        String
+  desc         String
+  link         String
+  publicLink   PublicLink @relation(fields: [publicLinkId], references: [id])
+  publicLinkId Int
 }
