@@ -1,15 +1,16 @@
 import emojis from './emojis';
+import user from './user'
 import express from 'express';
 const router = express.Router(); 
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import MessageResponse from '../interfaces/MessageResponse';
-import path from 'path';
 router.get<{}, MessageResponse>('/', (req, res) => {
   res.json({
     message: 'API - 👋🌎🌍🌏',
   });
 });
+router.use('/user',user)
 router.use('/emojis', emojis);
 router.get('/test',(req,res)=>{
   const age = req.body.age
