@@ -4,7 +4,6 @@ import { Resend } from 'resend';
 import db from "../../db"
 import { env } from 'process';
 import { Request , Response,NextFunction} from 'express';
-import { error } from 'console';
 import { SignupPayload } from '../types/user';
 const router = express.Router();
 
@@ -19,11 +18,12 @@ const verifyInput = (req: Request, res: Response, next: NextFunction) => {
     const payload = SignupPayload.safeParse(req.body)
     if (payload.success) {
         next()
-    }
-    return res.status(411).json({
+    }else{
+return res.status(411).json({
         msg : "Invalid Inputs"
     })
 }
+    }
 
 
 router.post("/",verifyInput,async(req,res)=>{

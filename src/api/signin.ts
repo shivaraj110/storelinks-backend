@@ -19,11 +19,13 @@ const verifyInput = (req: Request, res: Response, next: NextFunction) => {
     if (payload.success) {
         next()
     }
+else{
     return res.status(411).json({
         msg : "Invalid Inputs"
-    })
 }
-
+   )
+}
+}
 
 router.post("/",verifyInput, async (req, res) => {
     const resend = new Resend(env.RESEND_API_KEY);
