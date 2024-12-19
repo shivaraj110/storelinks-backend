@@ -3,17 +3,31 @@ import bcrypt from 'bcrypt'
 import { Resend } from 'resend';
 import db from "../../db"
 import { env } from 'process';
+import { error } from 'console';
 const router = express.Router();
 
 const genOtp = () => {
-return Math.floor(100000 + Math.random()* 900000)
+    return Math.floor(100000 + Math.random() * 900000)
+    
 }
 
-let currOtp:number
+let currOtp: number
 
-router.post("/signup",async(req,res)=>{
+
+router.post("/",async(req,res)=>{
     const resend = new Resend(env.RESEND_API_KEY);
     const email = req.body.email
+    try {
+        const user = await db.user.findFirst({
+        where: {
+            email
+        }
+    })
+    if (user) {
+        return res.json({
+            msg : "email already exists!"
+        })
+    }
 currOtp =  genOtp()
 resend.emails.send({
   from: 'shivaraj@storelinks.tech',
@@ -22,11 +36,15 @@ resend.emails.send({
   html:` <p> OTP  for your email verification is  <strong> ${currOtp} </strong></p>`
 })
 return res.json({
-msg : "sent an otp to your email"
+msg : "sent an otp to your email for verification"
 })
+    }
+    catch (e) {
+        console.error(e)
+    }
 })
 
-router.post("/signup/verify",async(req,res)=>{
+router.post("/verify",async(req,res)=>{
     const fname = req.body.fname
     const lname = req.body.fname
     const password = req.body.password
@@ -46,7 +64,6 @@ if(Number(otp) === currOtp){
                 console.error(err)
                 return;
             }
-                console.log('Hashed password:', hash);
                 await db.user.create({
                     data : {
                         fname,
@@ -85,43 +102,5 @@ router.get("/",async(req,res)=>{
     })
 })  
 
-router.get("/signin",async (req,res)=>{
-    const email = req.body.email
-    const userPass = req.body.password
-    const user = await db.user.findFirst({
-        where : {
-            email
-        }
-    })
 
-if(!user?.id){
-    return res.json({
-        msg: "user not found try signing up!"
-    })
-}
-    bcrypt.compare(userPass, user.password, (err, result) => {
-        if (err) {
-            // Handle error
-            console.error('Error comparing passwords:', err);
-            return res.json({
-                msg : "signin failed"
-            })
-        }
-    
-    if (result) {
-        // Passwords match, authentication successful
-        
-        console.log('Passwords match! User authenticated.');
-        return res.json({
-            msg : "signed in!"
-        })
-    } else {
-        // Passwords don't match, authentication failed
-        console.log('Passwords do not match! Authentication failed.');
-        return res.json({
-            msg : "auth failed!" 
-        })
-    }
-    });
-})
 export default router;
