@@ -4,7 +4,8 @@ import { Resend } from 'resend';
 import db from "../../db"
 import { env } from 'process';
 import { SigninPayload } from '../types/user';
-
+import jwt from 'jsonwebtoken'
+import { secret } from '../config/jwtSecret';
 const genOtp = () => {
     return Math.floor(100000 + Math.random() * 900000)
     
@@ -75,12 +76,16 @@ if(!user?.id){
     });
 })
 
-router.post("/verify",async(req,res)=>{
-const otp = req.body.otp
+router.post("/verify", async (req, res) => {
+    const email = req.body.email
+    const password = req.body.password
+    const otp = req.body.otp
+    const token = jwt.sign({email,password},secret)
 if(Number(otp) === currOtp){
     currOtp = 0
     return res.json({
-        msg : "signed in"
+        msg: "signed in",
+        token : token
     })
 }
 else{

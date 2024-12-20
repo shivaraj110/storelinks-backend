@@ -5,6 +5,8 @@ import db from "../../db"
 import { env } from 'process';
 import { Request , Response,NextFunction} from 'express';
 import { SignupPayload } from '../types/user';
+import jwt from 'jsonwebtoken'
+import { secret } from '../config/jwtSecret';
 const router = express.Router();
 
 const genOtp = () => {
@@ -77,7 +79,7 @@ const otp = req.body.otp
                 console.error(err)
                 return;
             }
-                await db.user.create({
+               const user =  await db.user.create({
                     data : {
                         fname,
                         lname,
@@ -87,9 +89,11 @@ const otp = req.body.otp
                 })
 
         });
-        }); 
+    }); 
+    const token = jwt.sign({email,password},secret)
     return res.json({
-        msg : "verified"
+        msg: "verified",
+        token: token
     })
     }
     else{
