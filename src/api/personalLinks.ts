@@ -89,4 +89,59 @@ router.get("/links",verifyUser,async (req,res)=>{
     })
 })
 
+router.delete("/link", verifyUser, async (req, res) => {
+    const userId = req.body.userId
+    const id = req.body.id
+    const link = await db.link.delete({
+        where: {
+            id
+        }
+    })
+    if (link) {
+        return res.json({
+            msg : `deleted ${link.title}!`
+        })
+    }
+    else {
+        return res.status(411).json({
+            msg : "error deleting the link!"
+        })
+    }
+})
+
+
+router.put("/link", verifyInput, verifyUser, async (req, res) => {
+    const id = req.body.id
+    const link = req.body.link
+    const title = req.body.title
+    const description = req.body.description
+    const userId = req.body.userId
+    try {
+        const Link = await db.link.update({
+            where: {
+                userId,
+                id
+            }, data: {
+                title,
+                desc: description,
+                link
+            }
+        })
+        if (Link) {
+           return res.json({
+                msg : `updated ${Link.title}`
+            })
+        }
+        else {
+           return res.json({
+                msg : "error updating the link!"
+            })
+        }
+    }
+    catch (e) {
+        error(e)
+        
+    }
+})
+
 export default router
