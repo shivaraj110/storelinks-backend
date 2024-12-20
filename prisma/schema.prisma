@@ -20,79 +20,56 @@ model User {
 }
 
 model Link {
-  id     Int    @id @default(autoincrement())
-  title  String
-  desc   String
-  link   String
-  user   User   @relation(fields: [userId], references: [id])
-  userId Int
+  id       Int      @id @default(autoincrement())
+  title    String
+  desc     String
+  link     String
+  user     User     @relation(fields: [userId], references: [id])
+  userId   Int
+  postedOn DateTime @default(now())
 
   @@index([userId])
 }
 
-model PublicLink {
-  id                    Int                     @id @default(autoincrement())
-  title                 String
-  description           String
-  link                  String
-  visits                Int                     @default(0)
-  upvotes               Int                     @default(0)
-  category              PublicLinkCategory      @relation(fields: [categoryId], references: [id])
-  categoryId            Int
-  FreeStudyMaterials    FreeStudyMaterials[]
-  FreeAndUsefulSoftware FreeAndUsefulSoftware[]
-  JobsAndInternships    JobsAndInternships[]
-  Scholarships          Scholarships[]
-  Hackathons            Hackathons[]
-}
-
-model PublicLinkCategory {
-  id          Int          @id @default(autoincrement())
-  category    String       @unique
-  publicLinks PublicLink[]
-}
-
 model FreeStudyMaterials {
-  id           Int        @id @default(autoincrement())
-  title        String
-  desc         String
-  link         String
-  publicLink   PublicLink @relation(fields: [publicLinkId], references: [id])
-  publicLinkId Int
+  id       Int    @id @default(autoincrement())
+  title    String
+  desc     String
+  link     String
+  category String
 }
 
 model FreeAndUsefulSoftware {
-  id           Int        @id @default(autoincrement())
-  title        String
-  desc         String
-  link         String
-  publicLink   PublicLink @relation(fields: [publicLinkId], references: [id])
-  publicLinkId Int
+  id       Int    @id @default(autoincrement())
+  title    String
+  desc     String
+  link     String
+  version  String
+  category String
 }
 
 model JobsAndInternships {
-  id           Int        @id @default(autoincrement())
-  title        String
-  desc         String
-  link         String
-  publicLink   PublicLink @relation(fields: [publicLinkId], references: [id])
-  publicLinkId Int
+  id     Int      @id @default(autoincrement())
+  title  String
+  desc   String
+  link   String
+  role   String
+  skills String[]
 }
 
 model Scholarships {
-  id           Int        @id @default(autoincrement())
-  title        String
-  desc         String
-  link         String
-  publicLink   PublicLink @relation(fields: [publicLinkId], references: [id])
-  publicLinkId Int
+  id    Int    @id @default(autoincrement())
+  title String
+  desc  String
+  link  String
+  org   String
 }
 
 model Hackathons {
-  id           Int        @id @default(autoincrement())
-  title        String
-  desc         String
-  link         String
-  publicLink   PublicLink @relation(fields: [publicLinkId], references: [id])
-  publicLinkId Int
+  id       Int    @id @default(autoincrement())
+  title    String
+  desc     String
+  link     String
+  location String
+  domain   String
 }
