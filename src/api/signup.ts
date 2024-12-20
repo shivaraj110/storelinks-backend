@@ -39,7 +39,7 @@ router.post("/",verifyInput,async(req,res)=>{
     })
     if (user) {
         return res.json({
-            msg : "email already exists!"
+            msg : "an user already exists with this email!"
         })
     }
 currOtp =  genOtp()
@@ -47,7 +47,7 @@ resend.emails.send({
   from: 'shivaraj@storelinks.tech',
   to: String(email),
   subject: 'email verification',
-  html:` <p> OTP  for your email verification is  <strong> ${currOtp} </strong></p>`
+  html:` <div> <img src='./logo.png' <p> OTP  for your email verification is  <strong> ${currOtp} </strong></p></div>`
 })
 return res.json({
 msg : "sent an otp to your email for verification"

@@ -6,10 +6,17 @@ import jwt from 'jsonwebtoken'
 import { secret } from '../config/jwtSecret';
 const router = express.Router();
 
-const verifyUser = async(req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split(" ")[1] ?? ""
+const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.headers.authorization) {
+        return res.status(411).json({
+            msg : "no token found!"
+        })
+    }
+    const token = req.headers.authorization.split(" ")[1]
+
     const user: any = jwt.verify(token, secret)
-    const loggedUser = await db.user.findFirst({
+    try {
+         const loggedUser = await db.user.findFirst({
         where: {
             email : user.email
         }
@@ -21,6 +28,10 @@ const verifyUser = async(req: Request, res: Response, next: NextFunction) => {
     }
     req.body.userId = loggedUser.id
     next()
+    }
+    catch (E) {
+        error(E)
+   }
 }
 
 const verifyInput = (req: Request, res: Response, next: NextFunction) => {
@@ -64,6 +75,18 @@ router.post("/link",verifyUser,verifyInput, async (req: Request, res: Response) 
             msg:"somthing went wrong!"
         })
     }
+})
+
+router.get("/links",verifyUser,async (req,res)=>{
+    const userId = req.body.userId
+    const links = await db.link.findMany({
+        where: {
+            userId
+        }
+    })
+    return res.json({
+        links
+    })
 })
 
 export default router
