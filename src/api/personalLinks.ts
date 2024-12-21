@@ -21,7 +21,7 @@ const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
             email : user.email
         }
     })
-    if (!loggedUser) {
+    if (!loggedUser || !loggedUser.loggedIn) {
         return res.status(411).json({
             msg : "you are not authenticated to perform this action"
         })

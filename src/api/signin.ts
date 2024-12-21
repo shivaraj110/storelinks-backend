@@ -39,6 +39,12 @@ router.post("/",verifyInput, async (req, res) => {
             email
         }
     })
+ 
+    if (user?.loggedIn) {
+        return res.status(413).json({
+            msg : "account is already in use! make sure to logout from all devices before trying again."
+        })
+    }
 
 if(!user?.id){
     return res.json({
@@ -60,7 +66,7 @@ if(!user?.id){
   from: 'shivaraj@storelinks.tech',
   to: String(email),
   subject: 'email verification',
-  html:` <div> <img src='./logo.png' <p> OTP  for your email verification is  <strong> ${currOtp} </strong></p></div>`
+  html:` <div> <img src='./logo.png'> <p> OTP  for your email verification is  <strong> ${currOtp} </strong></p></div>`
         })
         
         console.log('Passwords match! User authenticated.');
@@ -96,7 +102,7 @@ router.post("/forgotpassword", async (req: Request, res: Response) => {
   from: 'shivaraj@storelinks.tech',
   to: String(email),
   subject: 'password reset',
-  html:` <div> <img src='./logo.png' <p> OTP  for your password recovery is  <strong> ${currOtp} </strong></p></div>`
+  html:` <div> <img src='./logo.png'> <p> OTP  for your password recovery is  <strong> ${currOtp} </strong></p></div>`
      })
     return res.json({
         msg : "sent an otp to email"
@@ -171,6 +177,14 @@ router.post("/verify", async (req, res) => {
     const token = jwt.sign({email,password},secret)
 if(Number(otp) === currOtp){
     currOtp = 0
+    await db.user.update({
+        where: {
+            email
+        },
+        data: {
+            loggedIn : true
+        }
+    })
     return res.json({
         msg: "signed in",
         token : token
