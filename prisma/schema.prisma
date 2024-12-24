@@ -11,12 +11,18 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  fname    String
-  lname    String
-  email    String @unique
-  password String
-  links    Link[]
+  id                    Int                     @id @default(autoincrement())
+  fname                 String
+  lname                 String
+  email                 String                  @unique
+  password              String
+  links                 Link[]
+  FreeStudyMaterials    FreeStudyMaterials[]
+  FreeAndUsefulSoftware FreeAndUsefulSoftware[]
+  JobsAndInternships    JobsAndInternships[]
+  Scholarships          Scholarships[]
+  Hackathons            Hackathons[]
+  loggedIn              Boolean                 @default(false)
 }
 
 model Link {
@@ -32,44 +38,64 @@ model Link {
 }
 
 model FreeStudyMaterials {
-  id       Int    @id @default(autoincrement())
-  title    String
-  desc     String
-  link     String
-  category String
+  id         Int      @id @default(autoincrement())
+  title      String
+  desc       String
+  link       String
+  categories String[]
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+  postedOn   DateTime @default(now())
+  views      Int      @default(0)
 }
 
 model FreeAndUsefulSoftware {
-  id       Int    @id @default(autoincrement())
+  id       Int      @id @default(autoincrement())
   title    String
   desc     String
   link     String
   version  String
   category String
+  user     User     @relation(fields: [userId], references: [id])
+  userId   Int
+  postedOn DateTime @default(now())
+  views    Int      @default(0)
 }
 
 model JobsAndInternships {
-  id     Int      @id @default(autoincrement())
-  title  String
-  desc   String
-  link   String
-  role   String
-  skills String[]
+  id       Int      @id @default(autoincrement())
+  title    String
+  desc     String
+  link     String
+  role     String
+  skills   String[]
+  user     User     @relation(fields: [userId], references: [id])
+  userId   Int
+  postedOn DateTime @default(now())
+  views    Int      @default(0)
 }
 
 model Scholarships {
-  id    Int    @id @default(autoincrement())
-  title String
-  desc  String
-  link  String
-  org   String
+  id       Int      @id @default(autoincrement())
+  title    String
+  desc     String
+  link     String
+  org      String
+  user     User     @relation(fields: [userId], references: [id])
+  userId   Int
+  postedOn DateTime @default(now())
+  views    Int      @default(0)
 }
 
 model Hackathons {
-  id       Int    @id @default(autoincrement())
+  id       Int      @id @default(autoincrement())
   title    String
   desc     String
   link     String
   location String
   domain   String
+  user     User     @relation(fields: [userId], references: [id])
+  userId   Int
+  postedOn DateTime @default(now())
+  views    Int      @default(0)
 }

@@ -47,7 +47,7 @@ resend.emails.send({
   from: 'shivaraj@storelinks.tech',
   to: String(email),
   subject: 'email verification',
-  html:` <div> <img src='./logo.png'> <p> OTP  for your email verification is  <strong> ${currOtp} </strong></p></div>`
+ html:`<p> OTP  for your email verification is  <strong> ${currOtp} </strong></p><br><p>Team <strong><a href="storelinks.tech">storelinks.tech</a></strong></p>`
 })
 return res.json({
 msg : "sent an otp to your email for verification"
