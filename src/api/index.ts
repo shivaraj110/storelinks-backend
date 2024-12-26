@@ -9,14 +9,9 @@ import scholarships from './scholarships'
 import hackathons from './hackathons'
 import logout from './logout'
 import jobs from './jobs'
+import profile from './profile'
 const router = express.Router(); 
-import { PrismaClient } from '@prisma/client'
-import MessageResponse from '../interfaces/MessageResponse';
-router.get<{}, MessageResponse>('/', (req, res) => {
-  res.json({
-    message: 'API - 👋🌎🌍🌏',
-  });
-});
+router.use('/profile',profile)
 router.use('/user/signup',signup)
 router.use('/user/logout',logout)
 router.use('/personal',personal)
