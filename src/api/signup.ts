@@ -58,6 +58,25 @@ msg : "sent an otp to your email for verification"
     }
 })
 
+router.post("/resendotp", async (req, res) => {
+    const email = req.body.email
+    currOtp = genOtp()
+        const resend = new Resend(env.RESEND_API_KEY);
+     resend.emails.send({
+  from: 'shivaraj@storelinks.tech',
+  to: String(email),
+  subject: 'authentication for login',
+         html: ` <div> <img src='./logo.png'> <p> OTP for login is <strong> ${currOtp} </strong> </p><br>
+         <p>Team <strong><a href="storelinks.tech">storelinks.tech</a></strong></p>
+        Team <strong> storelinks.tech </strong>
+        `
+     })
+    return res.json({
+        msg : "sent an otp to email"
+    })
+})
+
+
 router.post("/verify",async(req,res)=>{
     const fname = req.body.fname
     const lname = req.body.fname
@@ -84,7 +103,8 @@ const otp = req.body.otp
                         fname,
                         lname,
                         email,
-                        password : hash
+                       password: hash,
+                        
                     }
                 })
 

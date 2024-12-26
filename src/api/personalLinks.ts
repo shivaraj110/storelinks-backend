@@ -144,4 +144,27 @@ router.put("/link", verifyInput, verifyUser, async (req, res) => {
     }
 })
 
+router.get("/profile",verifyUser,async(req,res)=>{
+const id = req.body.userId 
+const user = await db.user.findUnique({
+where:{
+id
+},
+select:{
+fname:true,
+lname :true,
+    email: true,
+    joinedOn:true
+}
+})
+if(!user){
+return res.status(411).json({
+msg : "no user found!"
+})
+}
+return res.json({
+user : user
+})
+})
+
 export default router

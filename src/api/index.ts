@@ -11,7 +11,6 @@ import logout from './logout'
 import jobs from './jobs'
 const router = express.Router(); 
 import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
 import MessageResponse from '../interfaces/MessageResponse';
 router.get<{}, MessageResponse>('/', (req, res) => {
   res.json({
