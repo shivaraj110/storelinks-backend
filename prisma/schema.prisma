@@ -16,13 +16,14 @@ model User {
   lname                 String
   email                 String                  @unique
   password              String
+  joinedOn              DateTime                @default(now())
   links                 Link[]
   FreeStudyMaterials    FreeStudyMaterials[]
   FreeAndUsefulSoftware FreeAndUsefulSoftware[]
   JobsAndInternships    JobsAndInternships[]
   Scholarships          Scholarships[]
   Hackathons            Hackathons[]
-  loggedIn              Boolean                 @default(false)
+  loggedIn              Boolean                 @default(true)
 }
 
 model Link {
