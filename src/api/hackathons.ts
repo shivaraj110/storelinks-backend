@@ -2,8 +2,8 @@ import express, { NextFunction, Request, Response } from 'express';
 import db from "../../db"
 import { error } from 'console'; 
 import jwt from 'jsonwebtoken'
-import { secret } from '../config/jwtSecret';
 import { hackathons } from '../types/categories';
+import { env } from 'process';
 const router = express.Router();
 
 const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -14,7 +14,7 @@ const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
     }
     const token = req.headers.authorization.split(" ")[1]
 
-    const user: any = jwt.verify(token, secret)
+    const user: any = jwt.verify(token, env.secret ?? "")
     try {
          const loggedUser = await db.user.findFirst({
         where: {

@@ -6,7 +6,6 @@ import { env } from 'process';
 import { Request , Response,NextFunction} from 'express';
 import { SignupPayload } from '../types/user';
 import jwt from 'jsonwebtoken'
-import { secret } from '../config/jwtSecret';
 const router = express.Router();
 
 const genOtp = () => {
@@ -110,7 +109,7 @@ const otp = req.body.otp
 
         });
     }); 
-    const token = jwt.sign({email,password},secret)
+    const token = jwt.sign({email,password},env.secret ?? "")
     return res.json({
         msg: "verified",
         token: token

@@ -2,8 +2,8 @@ import express from 'express';
 import db from "../../db"
 
 import jwt from 'jsonwebtoken'
-import { secret } from '../config/jwtSecret';
 import { error } from 'console';
+import { env } from 'process';
 const router = express.Router();
 
 router.put("/", async (req, res) => {
@@ -14,7 +14,7 @@ router.put("/", async (req, res) => {
     }
     const token = req.headers.authorization.split(" ")[1]
 
-    const user: any = jwt.verify(token, secret)
+    const user: any = jwt.verify(token, env.secret ?? "")
     try {
         const loggedUser = await db.user.update({
             where: {

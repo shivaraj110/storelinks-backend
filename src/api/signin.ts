@@ -5,7 +5,6 @@ import db from "../../db"
 import { env } from 'process';
 import { SigninPayload } from '../types/user';
 import jwt from 'jsonwebtoken'
-import { secret } from '../config/jwtSecret';
 import { error } from 'console';
 const genOtp = () => {
     return Math.floor(100000 + Math.random() * 900000)
@@ -198,7 +197,7 @@ router.post("/verify", async (req, res) => {
     const email = req.body.email
     const password = req.body.password
     const otp = req.body.otp
-    const token = jwt.sign({email,password},secret)
+    const token = jwt.sign({email,password},env.secret ?? "")
 if(Number(otp) === currOtp){
     currOtp = 0
     await db.user.update({
