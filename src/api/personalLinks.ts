@@ -90,7 +90,6 @@ router.get("/links",verifyUser,async (req,res)=>{
 })
 
 router.delete("/link", verifyUser, async (req, res) => {
-    const userId = req.body.userId
     const id = req.body.id
     const link = await db.link.delete({
         where: {
@@ -140,7 +139,9 @@ router.put("/link", verifyInput, verifyUser, async (req, res) => {
     }
     catch (e) {
         error(e)
-        
+        return res.status(411).json({
+msg : "something went wrong!"
+})
     }
 })
 

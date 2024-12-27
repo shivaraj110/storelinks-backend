@@ -85,6 +85,7 @@ if(!user?.id){
 
 router.post("/resendotp", async (req, res) => {
     const email = req.body.email
+    try {
     currOtp = genOtp()
         const resend = new Resend(env.RESEND_API_KEY);
      resend.emails.send({
@@ -95,10 +96,16 @@ router.post("/resendotp", async (req, res) => {
          <p>Team <strong><a href="storelinks.tech">storelinks.tech</a></strong></p>
         Team <strong> storelinks.tech </strong>
         `
+     })    
+     return res.json({
+         msg : "sent an otp to email"
      })
-    return res.json({
-        msg : "sent an otp to email"
-    })
+    }
+    catch (e) {
+        return res.status(413).json({
+          msg:  "something went wrong!"
+        })
+    }
 })
 
 router.post("/forgotpassword", async (req: Request, res: Response) => {
@@ -168,7 +175,7 @@ router.post("/resetpassword", async (req: Request, res: Response) => {
                     }
                     if (result) {
                         return res.json({
-                            msg: "password reset successfull"
+                            msg: "password reset successfull, login!"
                         })
                     }
                 });
