@@ -74,11 +74,6 @@ router.post("/link", verifyUser, verifyInput, async (req, res) => {
 })
 
 
-
-
-
-
-
 router.get("/links", verifyUser, async (req, res) => {
     try {
         const links = await db.freeStudyMaterials.findMany({
@@ -136,7 +131,6 @@ router.delete("/link", verifyUser, async (req, res) => {
         })
     }
 })
-
 
 router.put("/link", verifyInput, verifyUser, async (req, res) => {
     const id = req.body.id

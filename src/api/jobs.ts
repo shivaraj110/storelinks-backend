@@ -34,9 +34,11 @@ const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
    }
 }
 
-const verifyInput = (req: Request, res: Response, next: NextFunction) => {
+const verifyInput = (req:Request,res:Response,next:NextFunction) => {
     const linkInput = jobsAndInternships.safeParse(req.body)
     if (!linkInput.success) {
+        console.log(linkInput.error);
+        
         return res.status(411).json({
             msg : "invalid inputs!"
         })
@@ -80,7 +82,7 @@ router.post("/link", verifyUser, verifyInput, async (req, res) => {
 
 
 
-router.get("/links", verifyUser, async ( res:Response) => {
+router.get("/links", verifyUser, async ( req,res) => {
     try {
         const links = await db.jobsAndInternships.findMany({
             select: {

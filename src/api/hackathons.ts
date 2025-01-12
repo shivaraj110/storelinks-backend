@@ -77,11 +77,6 @@ router.post("/link", verifyUser, verifyInput, async (req, res) => {
 })
 
 
-
-
-
-
-
 router.get("/links", verifyUser, async (req, res) => {
     try {
         const links = await db.hackathons.findMany({

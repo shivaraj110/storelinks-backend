@@ -19,7 +19,7 @@ export const jobsAndInternships = z.object({
     title: z.string(),
   description:z.string(),
   link:z.string(),
-    skils: z.string().array(),
+    skills: z.string().array(),
     role : z.string()
 })
 
