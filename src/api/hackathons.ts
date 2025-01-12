@@ -50,12 +50,13 @@ router.post("/link", verifyUser, verifyInput, async (req, res) => {
     const link = req.body.link
     const domain = req.body.domain
     const location = req.body.location
+    const prizepool = req.body.prizepool
 
     try {
         const Link = await db.hackathons.create({
             data: {
                 title, desc: description, location,domain, link,
-                userId
+                userId,prizepool
             }
         })
         if (!Link) {
@@ -84,6 +85,22 @@ router.post("/link", verifyUser, verifyInput, async (req, res) => {
 router.get("/links", verifyUser, async (req, res) => {
     try {
         const links = await db.hackathons.findMany({
+            select: {
+                id: true,
+                user: {
+                    select: {
+                        fname:true
+                    }
+                },
+                title: true,
+                desc: true,
+                link: true,
+                views: true,
+                postedOn: true,
+                domain: true,
+                location: true,
+                prizepool:true
+            }
         })
         return res.json({
             links

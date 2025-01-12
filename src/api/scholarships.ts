@@ -82,6 +82,20 @@ router.post("/link", verifyUser, verifyInput, async (req, res) => {
 router.get("/links", verifyUser, async (req, res) => {
     try {
         const links = await db.scholarships.findMany({
+            select: {
+                id: true,
+                user: {
+                    select: {
+                        fname:true
+                    }
+                },
+                title: true,
+                desc: true,
+                link: true,
+                org: true,
+                views: true,
+                postedOn: true,
+            }
         })
         return res.json({
             links

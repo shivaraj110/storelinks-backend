@@ -84,6 +84,21 @@ router.post("/link", verifyUser, verifyInput, async (req, res) => {
 router.get("/links", verifyUser, async (req, res) => {
     try {
         const links = await db.freeAndUsefulSoftware.findMany({
+            select: {
+                id: true,
+                user: {
+                    select: {
+                        fname:true
+                    }
+                },
+                title: true,
+                desc: true,
+                link: true,
+                category: true,
+                version: true,
+                postedOn: true,
+                views:true
+            }
         })
         return res.json({
             links

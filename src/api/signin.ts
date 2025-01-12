@@ -5,7 +5,7 @@ import db from "../../db"
 import { env } from 'process';
 import { SigninPayload } from '../types/user';
 import jwt from 'jsonwebtoken'
-import { error } from 'console';
+import { error, log } from 'console';
 const genOtp = () => {
     return Math.floor(100000 + Math.random() * 900000)
     
@@ -69,6 +69,7 @@ if(!user?.id){
         })
         
         console.log('Passwords match! User authenticated.');
+        console.log(currOtp)
         return res.json({
      msg : "sent an otp to your email for verification"
  })
