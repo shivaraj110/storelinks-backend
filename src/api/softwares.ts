@@ -183,11 +183,10 @@ router.put("/link", verifyInput, verifyUser, async (req, res) => {
 
 router.put("/view", verifyUser, async (req, res) => {
     const id = req.body.id
-    const userId = req.body.userId 
     try {
     const Link = await db.freeAndUsefulSoftware.update({
         where: {
-            id,userId
+            id
         },
         data: {
             views: {

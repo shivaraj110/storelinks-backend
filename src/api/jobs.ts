@@ -114,12 +114,11 @@ router.get("/links", verifyUser, async ( req,res) => {
 })
 
 router.delete("/link", verifyUser, async (req, res) => {
-    const userId = req.body.userId
     const id = req.body.id
     try {
         const link = await db.jobsAndInternships.delete({
             where: {
-                id,userId
+                id
             }
         })
         if (link) {
@@ -181,11 +180,10 @@ router.put("/link", verifyInput, verifyUser, async (req, res) => {
 
 router.put("/view", verifyUser, async (req, res) => {
     const id = req.body.id
-    const userId = req.body.userId 
     try {
     const Link = await db.jobsAndInternships.update({
         where: {
-            id,userId
+            id
         },
         data: {
             views: {
