@@ -89,14 +89,15 @@ model Scholarships {
 }
 
 model Hackathons {
-  id       Int      @id @default(autoincrement())
-  title    String
-  desc     String
-  link     String
-  location String
-  domain   String
-  user     User     @relation(fields: [userId], references: [id])
-  userId   Int
-  postedOn DateTime @default(now())
-  views    Int      @default(0)
+  id        Int      @id @default(autoincrement())
+  title     String
+  desc      String
+  link      String
+  location  String
+  domain    String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  prizepool Int
+  postedOn  DateTime @default(now())
+  views     Int      @default(0)
 }
