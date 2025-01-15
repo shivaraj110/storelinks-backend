@@ -89,7 +89,8 @@ router.get("/links", verifyUser, async ( req,res) => {
                 id: true,
                 user: {
                     select: {
-                        fname:true
+                        fname: true,
+                        id:true
                     }
                 },
                 link: true,
