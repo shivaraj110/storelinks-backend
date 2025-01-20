@@ -12,8 +12,7 @@ const genOtp = () => {
     return Math.floor(100000 + Math.random() * 900000)
     
 }
-
-let currOtp: number
+const otpStore : Record<string,string> = {}
 
 const verifyInput = (req: Request, res: Response, next: NextFunction) => {
     const payload = SignupPayload.safeParse(req.body)
@@ -41,12 +40,12 @@ router.post("/",verifyInput,async(req,res)=>{
             msg : "an user already exists with this email!"
         })
     }
-currOtp =  genOtp()
+otpStore[email] = genOtp().toString()
 resend.emails.send({
   from: 'shivaraj@storelinks.tech',
   to: String(email),
   subject: 'email verification',
- html:`<p> OTP  for your email verification is  <strong> ${currOtp} </strong></p><br><p>Team <strong><a href="storelinks.tech">storelinks.tech</a></strong></p>`
+ html:`<p> OTP  for your email verification is  <strong> ${otpStore[email]} </strong></p><br><p>Team <strong><a href="storelinks.tech">storelinks.tech</a></strong></p>`
 })
 return res.json({
 msg : "sent an otp to your email for verification"
@@ -59,13 +58,13 @@ msg : "sent an otp to your email for verification"
 
 router.post("/resendotp", async (req, res) => {
     const email = req.body.email
-    currOtp = genOtp()
+    otpStore[email] = genOtp().toString()
         const resend = new Resend(env.RESEND_API_KEY);
      resend.emails.send({
   from: 'shivaraj@storelinks.tech',
   to: String(email),
   subject: 'authentication for login',
-         html: ` <div> <img src='./logo.png'> <p> OTP for login is <strong> ${currOtp} </strong> </p><br>
+         html: ` <div> <img src='./logo.png'> <p> OTP for login is <strong> ${otpStore[email]} </strong> </p><br>
          <p>Team <strong><a href="storelinks.tech">storelinks.tech</a></strong></p>
         Team <strong> storelinks.tech </strong>
         `
@@ -84,8 +83,7 @@ router.post("/verify",async(req,res)=>{
 const email = req.body.email
 const otp = req.body.otp
     try {
-    if(Number(otp) === currOtp){
-    currOtp = 0
+    if(String(otp) === otpStore[email]){
     bcrypt.genSalt(saltRounds, (err, salt) => {
         if (err) {
             console.error(err)
@@ -116,7 +114,6 @@ const otp = req.body.otp
     })
     }
     else{
-        currOtp = 0
         return res.json({
             msg:"verification failed!"
         })
