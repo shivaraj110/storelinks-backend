@@ -5,11 +5,12 @@ import db from "../../db"
 import { env } from 'process';
 import { SigninPayload } from '../types/user';
 import jwt from 'jsonwebtoken'
-import { error, log } from 'console';
+import { error } from 'console';
 const genOtp = () => {
     return Math.floor(100000 + Math.random() * 900000)
     
 }
+const otpStore : Record<string,string> = {}
 let currOtp: number
 const router = express.Router();
 
@@ -32,7 +33,7 @@ router.post("/",verifyInput, async (req, res) => {
     const resend = new Resend(env.RESEND_API_KEY);
     const email = req.body.email
     const userPass = req.body.password
-    currOtp = genOtp()
+    otpStore[email] = genOtp().toString()
     const user = await db.user.findUnique({
         where : {
             email
@@ -65,11 +66,11 @@ if(!user?.id){
   from: 'shivaraj@storelinks.tech',
   to: String(email),
   subject: 'email verification',
-  html:`<p> OTP  for your email verification is  <strong> ${currOtp} </strong></p><br><p>Team <strong><a href="storelinks.tech">storelinks.tech</a></strong></p>`
+  html:`<p> OTP  for your email verification is  <strong> ${otpStore[email]} </strong></p><br><p>Team <strong><a href="storelinks.tech">storelinks.tech</a></strong></p>`
         })
         
         console.log('Passwords match! User authenticated.');
-        console.log(currOtp)
+        console.log(otpStore[email])
         return res.json({
      msg : "sent an otp to your email for verification"
  })
@@ -109,8 +110,8 @@ router.post("/resendotp", async (req, res) => {
 })
 
 router.post("/forgotpassword", async (req: Request, res: Response) => {
-    currOtp = genOtp()
     const email = req.body.email
+    otpStore[email] = genOtp().toString()
     const user = await db.user.findUnique({
         where: {
             email
@@ -126,15 +127,15 @@ router.post("/forgotpassword", async (req: Request, res: Response) => {
   from: 'shivaraj@storelinks.tech',
   to: String(email),
   subject: 'password reset',
-  html:` <div> <img src='./logo.png'> <p> OTP  for your password recovery is  <strong> ${currOtp} </strong></p></div>`
+  html:` <div> <img src='./logo.png'> <p> OTP  for your password recovery is  <strong> ${otpStore[email]} </strong></p></div>`
      })
     return res.json({
         msg : "sent an otp to email"
     })
 })
 
-router.post("/resetpassword", async (req: Request, res: Response) => {
-    const otp = req.body.otp
+router.post("/resetpassword", async (req: Request, res: Response) => {    
+const otp = req.body.otp
     const email = req.body.email
     const newPassword = req.body.password
     const saltRounds = 10
@@ -144,7 +145,7 @@ router.post("/resetpassword", async (req: Request, res: Response) => {
             msg : "password required!"
         })
     }
-    if (Number(otp) === currOtp) {
+    if (String(otp) === otpStore[email]) {
         currOtp = 0
         bcrypt.genSalt(saltRounds, (err, salt) => {
             if (err) {
@@ -199,7 +200,7 @@ router.post("/verify", async (req, res) => {
     const password = req.body.password
     const otp = req.body.otp
     const token = jwt.sign({email,password},env.secret ?? "")
-if(Number(otp) === currOtp){
+if(String(otp) === otpStore[email]){
     currOtp = 0
     await db.user.update({
         where: {
@@ -215,7 +216,6 @@ if(Number(otp) === currOtp){
     })
 }
 else{
-    currOtp = 0
     return res.json({
         msg:"verification failed!"
     })
