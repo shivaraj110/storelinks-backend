@@ -7,6 +7,7 @@ import { Request , Response,NextFunction} from 'express';
 import { SignupPayload } from '../types/user';
 import jwt from 'jsonwebtoken'
 const router = express.Router();
+import rateLimit from 'express-rate-limit';
 
 const genOtp = () => {
     return Math.floor(100000 + Math.random() * 900000)
@@ -25,6 +26,13 @@ return res.status(411).json({
 }
     }
 
+const otpLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 3, // Limit each IP to 3 OTP requests per windowMs
+    message: 'Too many requests, please try again after 5 minutes',
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
 
 router.post("/",verifyInput,async(req,res)=>{
     const resend = new Resend(env.RESEND_API_KEY);
@@ -75,7 +83,7 @@ router.post("/resendotp", async (req, res) => {
 })
 
 
-router.post("/verify",async(req,res)=>{
+router.post("/verify",otpLimiter,async(req,res)=>{
     const fname = req.body.fname
     const lname = req.body.fname
     const password = req.body.password
@@ -125,21 +133,6 @@ const otp = req.body.otp
             })
         }
 })
-
-router.get("/",async(req,res)=>{
-    const user = await db.user.findFirst({
-        where : {
-            fname : req.body.fname
-        },
-        select : {
-            password : true
-        }
-    })
-    
-    return res.json({
-        user
-    })
-})  
 
 
 export default router;

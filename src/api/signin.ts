@@ -27,7 +27,6 @@ const genOtp = () => {
     
 }
 const otpStore : Record<string,string> = {}
-let currOtp: number
 const router = express.Router();
 
 
@@ -103,13 +102,13 @@ if(!user?.id){
 router.post("/resendotp", async (req, res) => {
     const email = req.body.email
     try {
-    currOtp = genOtp()
+otpStore[email] = genOtp().toString()
         const resend = new Resend(env.RESEND_API_KEY);
      resend.emails.send({
   from: 'shivaraj@storelinks.tech',
   to: String(email),
   subject: 'authentication for login',
-         html: ` <div> <img src='./logo.png'> <p> OTP for login is <strong> ${currOtp} </strong> </p><br>
+         html: ` <div> <img src='./logo.png'> <p> OTP for login is <strong> ${otpStore[email]} </strong> </p><br>
          <p>Team <strong><a href="storelinks.tech">storelinks.tech</a></strong></p>
         Team <strong> storelinks.tech </strong>
         `
@@ -163,7 +162,6 @@ const otp = req.body.otp
         })
     }
     if (String(otp) === otpStore[email]) {
-        currOtp = 0
         bcrypt.genSalt(saltRounds, (err, salt) => {
             if (err) {
                 console.error(err)
@@ -204,12 +202,11 @@ const otp = req.body.otp
     else {
     return res.status(413).json({
         msg: "otp verification falied",
-        currOtp
      }) 
     } 
     }
     catch (E) {
-        error(E)
+      console.log(E)
     }
 })
 
@@ -219,7 +216,6 @@ router.post("/verify",otpLimiter, async (req, res) => {
     const otp = req.body.otp
     const token = jwt.sign({email,password},env.secret ?? "")
 if(String(otp) === otpStore[email]){
-    currOtp = 0
     await db.user.update({
         where: {
             email
