@@ -6,6 +6,22 @@ import { env } from 'process';
 import { SigninPayload } from '../types/user';
 import jwt from 'jsonwebtoken'
 import { error } from 'console';
+import rateLimit from 'express-rate-limit';
+const otpLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 3, // Limit each IP to 3 OTP requests per windowMs
+    message: 'Too many requests, please try again after 5 minutes',
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+const passwordResetLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // Limit each IP to 5 password reset requests per windowMs
+    message: 'Too many password reset attempts, please try again after 15 minutes',
+    standardHeaders: true,
+    legacyHeaders: false,
+});
 const genOtp = () => {
     return Math.floor(100000 + Math.random() * 900000)
     
@@ -29,7 +45,7 @@ else{
 }
 }
 
-router.post("/",verifyInput, async (req, res) => {
+router.post("/",verifyInput,async (req, res) => {
     const resend = new Resend(env.RESEND_API_KEY);
     const email = req.body.email
     const userPass = req.body.password
@@ -129,12 +145,13 @@ router.post("/forgotpassword", async (req: Request, res: Response) => {
   subject: 'password reset',
   html:` <div> <img src='./logo.png'> <p> OTP  for your password recovery is  <strong> ${otpStore[email]} </strong></p></div>`
      })
+console.log(otpStore[email])
     return res.json({
         msg : "sent an otp to email"
     })
 })
 
-router.post("/resetpassword", async (req: Request, res: Response) => {    
+router.post("/resetpassword",passwordResetLimiter, async (req: Request, res: Response) => {    
 const otp = req.body.otp
     const email = req.body.email
     const newPassword = req.body.password
@@ -175,6 +192,7 @@ const otp = req.body.otp
                         })
                     }
                     if (result) {
+                        console.log("changed the password!")
                         return res.json({
                             msg: "password reset successfull, login!"
                         })
@@ -195,7 +213,7 @@ const otp = req.body.otp
     }
 })
 
-router.post("/verify", async (req, res) => {
+router.post("/verify",otpLimiter, async (req, res) => {
     const email = req.body.email
     const password = req.body.password
     const otp = req.body.otp
@@ -216,7 +234,7 @@ if(String(otp) === otpStore[email]){
     })
 }
 else{
-    return res.json({
+    return res.status(413).json({
         msg:"verification failed!"
     })
 }
